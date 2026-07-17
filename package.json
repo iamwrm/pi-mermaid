@@ -1,6 +1,6 @@
 {
   "name": "pi-mermaid",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Pi extension that renders ```mermaid fences as Unicode box-drawing diagrams, powered by xai-org/grok-build's terminal Mermaid renderer compiled to WASM.",
   "keywords": [
     "pi-package",

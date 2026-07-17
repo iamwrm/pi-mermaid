@@ -21,13 +21,26 @@ diagrams directly in the transcript.
 
 ## What it does
 
-- After every assistant message, any ` ```mermaid ` fences in its text are
-  rendered as display-only transcript entries (never sent back to the LLM).
+- Keeps each completed ` ```mermaid ` source block visible and inserts a
+  `◇ rendered` Unicode preview immediately below that block, before the next
+  paragraph. Multiple diagrams therefore stay beside their surrounding
+  explanation instead of collecting at the end of the assistant message.
+- While a model is streaming an unclosed fence, shows ordinary source only;
+  the preview appears atomically when the closing fence arrives.
 - `/mermaid` — no argument: re-render the fences from the latest assistant
-  message; with an argument: render inline mermaid source, or a file path
-  (`.mmd` raw source, or markdown whose fences are extracted).
+  message as standalone entries; with an argument: render inline Mermaid
+  source, or a file path (`.mmd` raw source, or markdown whose fences are
+  extracted).
 - Diagrams re-render width-aware on terminal resize and use only bold/dim/
   italic SGR attributes, so they respect any terminal theme.
+- If a horizontal `graph`/`flowchart` is too wide, the preview retries it as
+  `TD` and labels the display `reflowed LR→TD` (source is untouched). Other
+  intrinsic overflow becomes a precise `preview needs N columns; M available`
+  notice—never grok-build's inapplicable “open the image” hint or a duplicate
+  framed copy of the source.
+
+Inline previews are display-only. The original source remains unchanged in
+session storage and model context.
 
 Supported diagram types: `graph`/`flowchart` (incl. subgraphs), `sequenceDiagram`,
 `stateDiagram`, `classDiagram`, `erDiagram`. Anything else falls back to the
@@ -63,7 +76,24 @@ a ~90-line path crate named `ratatui` that lets the vendored file compile
 untouched (and emit SGR-attribute styling instead of ratatui spans).
 
 A WASM panic (the source is untrusted model output) traps in JS; the engine
-re-instantiates itself and the entry falls back to showing the raw source.
+re-instantiates itself and leaves pi's original source block untouched.
+
+### Inline integration and compatibility
+
+Pi 0.80.10 has no public Markdown code-block renderer hook. The extension
+therefore guards and patches the live pi-tui `Markdown.renderToken` prototype
+method, first calling pi's original source renderer and then inserting the
+preview at that token's effective width (including list/blockquote nesting).
+Pi's extension loader aliases `@earendil-works/pi-tui` to the running instance,
+so the patch reaches the actual TUI class. A global symbol plus reference count
+prevents double wrapping across duplicate activation/reload, and
+`session_shutdown` restores the original method.
+
+If a future pi release changes/removes that internal method, activation remains
+safe: pi-mermaid warns once and falls back to its 0.1 behavior (display-only
+diagram entries after the assistant message). `/mermaid` remains available in
+either mode. This guard should be revalidated against every pi release until pi
+exposes a public code-block renderer API.
 
 ## Rebuilding the WASM
 
@@ -72,8 +102,9 @@ rustup target add wasm32-unknown-unknown
 npm run build:wasm   # cargo build + brotli-compress into pi-mermaid.wasm.br
 ```
 
-Then run `npm test` (strict typecheck + 14 unit tests over jiti, including the
-WASM ABI round-trip). The vendored `rust/src/mermaid.rs` also carries its
+Then run `npm test` (strict typecheck + 20 unit tests over jiti, including the
+WASM ABI round-trip, guarded inline-patch lifecycle, vertical reflow, and
+ANSI-aware natural-width reporting). The vendored `rust/src/mermaid.rs` also carries its
 upstream test suite: `cd rust && cargo test` (150 tests).
 
 ## Re-syncing with upstream
