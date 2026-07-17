@@ -1,0 +1,4 @@
+node_modules/
+rust/target/
+# Only the brotli-compressed module is committed/shipped.
+pi-mermaid.wasm

@@ -1,0 +1,9 @@
+[package]
+# Deliberately named `ratatui`: this local path crate shadows crates.io ratatui
+# so the vendored mermaid.rs compiles unmodified against a tiny data-type shim
+# (no backend, no crossterm) that also builds on wasm32-unknown-unknown.
+name = "ratatui"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Minimal ratatui data-type shim (Style/Modifier/Span/Line) for pi-mermaid-wasm"

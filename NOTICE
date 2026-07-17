@@ -1,0 +1,14 @@
+pi-mermaid
+
+This package includes a vendored, unmodified copy of the terminal Mermaid
+renderer from xai-org/grok-build (rust/src/mermaid.rs, originally
+crates/codegen/xai-grok-markdown/src/mermaid.rs at commit
+8adf9013a0929e5c7f1d4e849492d2387837a28d):
+
+  Copyright 2023-2026 SpaceXAI
+  Licensed under the Apache License, Version 2.0
+  https://github.com/xai-org/grok-build
+
+The upstream license text is preserved in rust/LICENSE.grok-build.
+All other code in this package is likewise licensed under the Apache
+License, Version 2.0 (see LICENSE).

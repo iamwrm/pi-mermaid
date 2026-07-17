@@ -1,0 +1,23 @@
+[package]
+name = "pi-mermaid-wasm"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Mermaid diagram -> Unicode box-drawing art, vendored from xai-org/grok-build, compiled to WASM for the pi-mermaid extension"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+unicode-width = "0.2"
+ratatui = { path = "ratatui-shim" }
+
+[workspace]
+members = [".", "ratatui-shim"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+panic = "abort"
+codegen-units = 1

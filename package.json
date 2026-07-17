@@ -1,0 +1,44 @@
+{
+  "name": "pi-mermaid",
+  "version": "0.1.0",
+  "description": "Pi extension that renders ```mermaid fences as Unicode box-drawing diagrams, powered by xai-org/grok-build's terminal Mermaid renderer compiled to WASM.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "mermaid",
+    "diagram"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iamwrm/pi-mermaid.git"
+  },
+  "files": [
+    "index.ts",
+    "pi-mermaid.wasm.br",
+    "README.md",
+    "Changelog.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "npm run check && node --test tests/*.test.mjs",
+    "build:wasm": "cd rust && cargo build --release --target wasm32-unknown-unknown && node -e \"const z=require('zlib'),fs=require('fs');fs.writeFileSync('../pi-mermaid.wasm.br',z.brotliCompressSync(fs.readFileSync('target/wasm32-unknown-unknown/release/pi_mermaid_wasm.wasm'),{params:{[z.constants.BROTLI_PARAM_QUALITY]:11}}))\""
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.80.10",
+    "@earendil-works/pi-tui": "^0.80.10",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
